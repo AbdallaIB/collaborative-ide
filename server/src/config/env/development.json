@@ -1,0 +1,20 @@
+{
+  "SERVER_URL": "http://localhost:3030",
+  "db": {
+    "driver": "mongodb",
+    "host": "localhost",
+    "port": "27017",
+    "name": "collaborativeIde",
+    "replica": {
+      "replicaPort": "27017"
+    }
+  },
+  "logger": {
+    "dataBase": {
+      "host": "localhost",
+      "db": "collaborativeIdeDevLogs",
+      "apiLogCollection": "apiLogs",
+      "port": "27017"
+    }
+  }
+}
