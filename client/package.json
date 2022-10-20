@@ -1,0 +1,109 @@
+{
+  "name": "collaborative-ide",
+  "version": "0.0.0",
+  "private": false,
+  "license": "MIT",
+  "scripts": {
+    "husky:postinstall": "husky install",
+    "start": "cross-env NODE_ENV=development webpack-dev-server --config ./webpack/webpack.config.dev.js --hot",
+    "build": "cross-env NODE_ENV=production webpack --config ./webpack/webpack.config.prod.js",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "build:webpack": "webpack --mode production",
+    "start:clean": " yarn && yarn start",
+    "generate:icons": "node scripts/generate-icons.js",
+    "generate:component": "npx generate-react-cli component",
+    "generate:page": "npx generate-react-cli component --type=page",
+    "update:check": "yarn outdated",
+    "update:single": "yarn up",
+    "update": "yarn update",
+    "code:check": "prettier --check \"src/**/*.{ts,tsx,js,css,scss,html}\"",
+    "code:format": "prettier --write \"src/**/*.{ts,tsx,js,css,scss,html}\"",
+    "code:format:specific-file": "prettier --write",
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix ."
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^2.8.8",
+    "@hot-loader/react-dom": "^17.0.2",
+    "axios": "^0.26.1",
+    "codemirror": "^5.62.0",
+    "formik": "^2.2.9",
+    "mobx": "^6.6.2",
+    "mobx-react": "^7.3.0",
+    "react": "^17.0.0",
+    "react-dom": "^17.0.0",
+    "react-router-dom": "^6.3.0",
+    "react-toastify": "^9.0.8",
+    "styled-components": "^5.3.6",
+    "typescript": "^4.8.3",
+    "y-codemirror": "^2.1.1",
+    "y-websocket": "^1.4.5",
+    "yjs": "^13.5.10",
+    "zustand": "^4.1.2"
+  },
+  "devDependencies": {
+    "@babel/preset-env": "^7.19.4",
+    "@babel/preset-react": "^7.18.6",
+    "@testing-library/jest-dom": "^5.11.4",
+    "@testing-library/react": "^12.0.4",
+    "@testing-library/user-event": "^12.1.10",
+    "@types/classnames": "^2.3.1",
+    "@types/codemirror": "^5.60.5",
+    "@types/jest": "^27.0.1",
+    "@types/node": "^17.0.23",
+    "@types/react": "^17.0.39",
+    "@types/react-dom": "^17.0.11",
+    "@types/react-modal": "^3.13.1",
+    "@types/react-router-dom": "^5.3.3",
+    "@types/styled-components": "^5.1.25",
+    "@typescript-eslint/eslint-plugin": "^5.18.0",
+    "@typescript-eslint/parser": "^5.18.0",
+    "autoprefixer": "^10.4.8",
+    "babel-core": "^6.26.3",
+    "babel-loader": "^8.2.5",
+    "babel-preset-react": "^6.24.1",
+    "cross-env": "^7.0.3",
+    "css-loader": "^6.7.1",
+    "eslint": "^8.13.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-react": "^7.29.4",
+    "file-loader": "^6.2.0",
+    "generate-react-cli": "^7.1.0",
+    "husky": "^7.0.4",
+    "mime-types": "^2.1.35",
+    "postcss": "^8.4.16",
+    "postcss-import": "^15.0.0",
+    "postcss-loader": "^7.0.1",
+    "prettier": "^2.7.1",
+    "process": "^0.11.10",
+    "react-scripts": "^5.0.1",
+    "tailwindcss": "^3.1.8",
+    "ts-loader": "^9.3.1",
+    "webpack": "^5.38.1",
+    "webpack-cli": "^4.7.2",
+    "webpack-dev-server": "^4.11.0"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "overrides": {
+    "styled-components": "^5"
+  }
+}
