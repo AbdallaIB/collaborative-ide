@@ -1,0 +1,33 @@
+.header {
+    display          : -webkit-box;
+    display          : -ms-flexbox;
+    display          : flex;
+    -webkit-box-align: center;
+    -ms-flex-align   : center;
+    align-items      : center;
+    -webkit-box-pack : justify;
+    -ms-flex-pack    : justify;
+    justify-content  : space-between;
+    position         : relative;
+    border-bottom    : 1px solid #dddddd;
+}
+
+.footer {
+    padding          : 1rem 0;
+    padding-bottom   : 0;
+    display          : -webkit-box;
+    display          : -ms-flexbox;
+    display          : flex;
+    gap              : 1rem;
+    -webkit-box-align: center;
+    -ms-flex-align   : center;
+    align-items      : center;
+    -webkit-box-pack : end;
+    -ms-flex-pack    : end;
+    justify-content  : flex-end;
+}
+
+.modal-close {
+    background-color: transparent;
+    font-weight     : 600;
+}

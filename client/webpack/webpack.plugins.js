@@ -21,5 +21,5 @@ module.exports = [
   new webpack.ProvidePlugin({
     Buffer: ['buffer', 'Buffer'],
   }),
-  new webpack.EnvironmentPlugin(['SOCKET_ENDPOINT', 'BASE_API_URL']),
+  new webpack.EnvironmentPlugin(['WEBSOCKET_ENDPOINT', 'BASE_API_URL']),
 ];
