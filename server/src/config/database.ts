@@ -1,5 +1,5 @@
 import { config } from '@config/config';
-import mongoose, { ConnectOptions } from 'mongoose';
+import { ConnectOptions, connect, connection } from 'mongoose';
 
 const moduleName = '[database]';
 import loggerHandler from '@utils/logger';
@@ -11,13 +11,13 @@ const getDatabaseUrl = () => {
   if (process.env.NODE_ENV === 'development') {
     return `${config.db.driver}://${config.db.host}:${config.db.port}/${config.db.name}`;
   }
-  return `${config.db.driver}://${process.env.DB_USER}:${process.env.DB_PASS}@${config.db.host}/${config.db.name}?retryWrites=true&w=majority&ssl=true`;
+  return `${config.db.driver}://${process.env.DB_USER}:${process.env.DB_PASS}@${config.db.host}/${config.db.name}?retryWrites=true&w=majority&ssl=true&tls=true&authSource=admin&replicaSet=db-mongodb-lon1-60728`;
 };
 
 const dbURI = getDatabaseUrl();
 
 const connectWithRetry = () => {
-  return mongoose.connect(dbURI, config.db_options as ConnectOptions, (err) => {
+  return connect(dbURI, config.db_options as ConnectOptions, (err) => {
     if (err) {
       logger.error('Mongoose failed to connect', err);
     }
@@ -26,15 +26,15 @@ const connectWithRetry = () => {
 
 connectWithRetry();
 
-mongoose.connection.on('connected', () => {
+connection.on('connected', () => {
   logger.info(`.mongoose.connected, connection has been established with ${dbURI}`);
 });
 
-mongoose.connection.on('error', (err) => {
+connection.on('error', (err) => {
   logger.error('.mongoose.error, connection to mongo failed', err);
 });
 
-mongoose.connection.on('disconnected', () => {
+connection.on('disconnected', () => {
   logger.warn('.mongoose.disconnected connection closed - retrying in 5 sec');
   setTimeout(connectWithRetry, 5000);
 });
