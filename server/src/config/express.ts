@@ -13,8 +13,10 @@ const expressApp = express();
 expressApp.use(express.json({ limit: '10kb' }));
 expressApp.use(express.urlencoded({ extended: false }));
 
+// Cors
+const origin = process.env.NODE_ENV !== 'production' ? '*' : process.env.REACT_CLIENT_ORIGIN;
 const corsOptions = {
-  origin: process.env.REACT_CLIENT_ORIGIN,
+  origin: origin,
   optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
 };
 expressApp.use(cors(corsOptions));

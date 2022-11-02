@@ -1,0 +1,17 @@
+{
+  "db": {
+    "driver": "mongodb+srv",
+    "host": "db-mongodb-lon1-60728-d9b4422d.mongo.ondigitalocean.com",
+    "port": "",
+    "name": "admin"
+  },
+  "logger": {
+    "dataBase": {
+      "driver": "mongodb+srv",
+      "host": "db-mongodb-lon1-60728-d9b4422d.mongo.ondigitalocean.com",
+      "db": "collaborativeIdeProdLogs",
+      "apiLogCollection": "apiLogs",
+      "port": ""
+    }
+  }
+}

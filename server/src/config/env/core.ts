@@ -1,7 +1,6 @@
 import * as path from 'path';
 
 const rootPath = path.normalize(`${__dirname}/../../..`);
-console.log('rootPath', rootPath);
 
 export const core = {
   root: rootPath,
@@ -34,7 +33,7 @@ export const core = {
     readPreference: 'nearest',
     useUnifiedTopology: true,
   },
-  TOKEN_EXPIRE_TIME_SEC: 1500000,
+  TOKEN_EXPIRE_TIME_SEC: 15000000,
   TOKEN_SECRET_KEY: process.env.TOKEN_SECRET_KEY,
   MONGODB: {
     DOCUMENT_EXPIRY: 3 * 3600,
