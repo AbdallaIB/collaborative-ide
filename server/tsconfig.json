@@ -17,7 +17,8 @@
       "@thirdParty/*": ["src/thirdParty/*"],
       "@middlewares/*": ["src/middlewares/*"],
       "@services/*": ["src/services/*"],
-      "@socket/*": ["src/socket/*"]
+      "@socket/*": ["src/websocket/*"],
+      "@shared/*": ["src/shared/*"]
     }
   },
   "include": ["src/**/*.ts", "app.ts"],
