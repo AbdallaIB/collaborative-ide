@@ -25,7 +25,7 @@ const customFormat = combine(
   colorize({ all: true }),
   // format.align(),
   prettyPrint(),
-  printf((info) => `${info.timestamp} ${process.pid}/tic-tac-toe ${info.level}: ${info.message}`),
+  printf((info) => `${info.timestamp} ${process.pid}/collaborative-ide ${info.level}: ${info.message}`),
 );
 
 const logger = createLogger({
