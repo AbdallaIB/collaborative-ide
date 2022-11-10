@@ -11,10 +11,17 @@ const useToast = () => {
     return toast.error(msg);
   };
 
+  const errorMessage = (err: any) => {
+    const resMessage =
+      (err.response && err.response.data && err.response.data.message) || err.message || err.toString() || err[0].msg;
+    return error(resMessage);
+  };
+
   return {
     promise,
     success,
     error,
+    errorMessage,
   };
 };
 export default useToast;

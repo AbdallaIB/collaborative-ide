@@ -10,7 +10,7 @@ interface Props {
 }
 
 const ProjectHeader = ({ leaveSession, sessionId }: Props) => {
-  const { success } = useToast();
+  const { promise } = useToast();
   const [participants, setParticipants] = useState<ProviderUser[]>([]);
   const [showCopyDropdown, setShowCopyDropdown] = useState(false);
   const sessionInviteLink = window.location.href;
@@ -36,7 +36,12 @@ const ProjectHeader = ({ leaveSession, sessionId }: Props) => {
 
   const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text);
-    success('Copied!');
+    const copyPromise = new Promise((r) => setTimeout(r, 1000));
+    promise(copyPromise, {
+      loading: 'Copying...',
+      success: 'Copied!',
+      error: 'Error copying',
+    });
     setShowCopyDropdown(false);
   };
 
