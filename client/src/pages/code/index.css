@@ -1,0 +1,141 @@
+.top-pane {
+    width           : 100%;
+    background-color: hsl(225, 6%, 25%);
+}
+
+.pane {
+    width                : 100%;
+    height               : 100%;
+    display              : -webkit-box;
+    display              : -ms-flexbox;
+    display              : flex;
+    -webkit-box-orient   : vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction   : column;
+    flex-direction       : column;
+}
+
+.editor-container {
+    width                  : 100%;
+    -webkit-box-flex       : 1;
+    -ms-flex-positive      : 1;
+    flex-grow              : 1;
+    -ms-flex-preferred-size: 0;
+    flex-basis             : 0;
+    display                : -webkit-box;
+    display                : -ms-flexbox;
+    display                : flex;
+    -webkit-box-orient     : vertical;
+    -webkit-box-direction  : normal;
+    -ms-flex-direction     : column;
+    flex-direction         : column;
+}
+
+.editor-container.collapsed {
+    -webkit-box-flex : 0;
+    -ms-flex-positive: 0;
+    flex-grow        : 0;
+}
+
+.editor-container.collapsed .CodeMirror-scroll {
+    position: absolute;
+    overflow: hidden !important;
+}
+
+.CodeMirror-scroll {
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    padding   : 0;
+    margin    : 0;
+}
+
+.expand-collapse-btn {
+    margin-left: .5rem;
+    background : none;
+    border     : none;
+    color      : white;
+    cursor     : pointer;
+}
+
+.editor-title {
+    width           : 100%;
+    display         : -webkit-box;
+    display         : -ms-flexbox;
+    display         : flex;
+    -webkit-box-pack: justify;
+    -ms-flex-pack   : justify;
+    justify-content : space-between;
+    color           : white;
+}
+
+.CodeMirror {
+    height    : 100% !important;
+    width     : 100%;
+    text-align: left;
+}
+
+.code-mirror-wrapper {
+    -webkit-box-flex          : 1;
+    -ms-flex-positive         : 1;
+    flex-grow                 : 1;
+    border-bottom-right-radius: .5rem;
+    border-bottom-left-radius : .5rem;
+    overflow                  : hidden;
+}
+
+.cm-editor {
+    height: 100%;
+}
+
+.remote-caret {
+    position         : absolute;
+    border-left      : black;
+    border-left-style: solid;
+    border-left-width: 2px;
+    height           : 1em;
+}
+
+.remote-caret>div {
+    position           : relative;
+    top                : -0.4em;
+    font-size          : 13px;
+    font-family        : serif;
+    font-style         : normal;
+    font-weight        : normal;
+    line-height        : normal;
+    -webkit-user-select: none;
+    -moz-user-select   : none;
+    -ms-user-select    : none;
+    user-select        : none;
+    color              : white;
+    padding-left       : 2px;
+    padding-right      : 2px;
+    z-index            : 3;
+    border-radius      : 10%;
+}
+
+.lint-error {
+    font-family: arial;
+    font-size  : 70%;
+    background : #ffa;
+    color      : #a00;
+    padding    : 2px 5px 3px;
+}
+
+.lint-error-icon {
+    color           : white;
+    background-color: red;
+    font-weight     : bold;
+    border-radius   : 50%;
+    padding         : 0 3px;
+    margin-right    : 7px;
+}
+
+.cm-s-material-darker.CodeMirror {
+    background-color: #404044 !important;
+}
+
+.cm-s-material-darker .CodeMirror-gutters {
+    background-color: #404044 !important;
+    color           : white !important;
+}
