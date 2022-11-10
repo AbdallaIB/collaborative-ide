@@ -17,12 +17,6 @@ interface AppRoute extends PathRouteProps {
   type?: RouteType;
 }
 export const AppRoutes: AppRoute[] = [
-  // Restricted Routes
-  //   {
-  //     type: RouteType.PRIVATE,
-  //     path: 'dashboard',
-  //     children: <Dashboard />,
-  //   },
   // Private Routes
   {
     type: RouteType.PRIVATE,

@@ -4,9 +4,9 @@ import useAuthStore from '@lib/stores/auth';
 
 const PrivateRoute = ({ children }: RouteProps) => {
   const location = useLocation();
-  const { getUser } = useAuthStore();
+  const { authUser } = useAuthStore();
 
-  if (!getUser()) {
+  if (!authUser) {
     return <Navigate to={`/login?redirect=${encodeURIComponent(location.pathname)}`} />;
   }
 
