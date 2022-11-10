@@ -1,25 +1,21 @@
 import { IUser } from '@api/types';
 import create from 'zustand';
 
-type Store = {
+type AuthStore = {
   token: string;
   authUser: IUser | null;
-  requestLoading: boolean;
-  setRequestLoading: (isLoading: boolean) => void;
   logout: () => void;
   authenticate: (user: IUser, token: string) => void;
-  getToken: () => string;
-  getUser: () => IUser | null;
 };
 
-const useStore = create<Store>((set, get) => ({
-  token: '',
-  authUser: null,
-  requestLoading: false,
-  setRequestLoading: (isLoading) => set((state) => ({ ...state, requestLoading: isLoading })),
+const getLocalStorage = (key: string) => JSON.parse(localStorage.getItem(key) || 'null');
+const setLocalStorage = (key: string, value: any) => localStorage.setItem(key, JSON.stringify(value));
+
+const useAuthStore = create<AuthStore>((set, get) => ({
+  token: getLocalStorage('token') || '',
+  authUser: getLocalStorage('user') || null,
   logout: () => {
-    localStorage.setItem('token', '');
-    localStorage.setItem('user', '');
+    localStorage.clear();
     set((state) => ({
       ...state,
       token: '',
@@ -27,21 +23,14 @@ const useStore = create<Store>((set, get) => ({
     }));
   },
   authenticate: (user: IUser, token: string) => {
-    localStorage.setItem('token', token);
-    localStorage.setItem('user', JSON.stringify(user));
+    setLocalStorage('token', token);
+    setLocalStorage('user', user);
     set((state) => ({
       ...state,
       token,
       authUser: user,
     }));
   },
-  getToken: () => {
-    return get().token || localStorage.getItem('token') || '';
-  },
-  getUser: () => {
-    const user = localStorage.getItem('user');
-    return get().authUser || JSON.parse(user || 'null') || null;
-  },
 }));
 
-export default useStore;
+export default useAuthStore;
