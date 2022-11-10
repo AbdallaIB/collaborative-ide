@@ -2,7 +2,7 @@ import { ProjectCreateInput } from '@api/types';
 import Button from '@components/shared/button';
 import Input from '@components/shared/input';
 import { Form, Formik } from 'formik';
-import { createProjectSchema } from '../../../../server/src/shared/schemas/project';
+import { createProjectSchema } from '@utils/schemas';
 
 interface Props {
   onCreateProject: (values: ProjectCreateInput) => void;
