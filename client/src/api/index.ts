@@ -16,3 +16,12 @@ export async function apiRequest<D = Record<string, unknown>, R = unknown>(
   });
   return res.data;
 }
+
+export const getAuthHeaders = () => {
+  const accessToken = localStorage.getItem('token') || 'null';
+  const headers = {
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${JSON.parse(accessToken)}`,
+  };
+  return headers;
+};

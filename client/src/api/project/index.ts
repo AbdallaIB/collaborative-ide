@@ -29,5 +29,5 @@ export const updateProject = async (id: string, values: ProjectUpdateInput) => {
 
 export const deleteProject = async (id: string) => {
   const headers = getAuthHeaders();
-  return apiRequest<string, GenericResponse>('delete', 'project/' + id, headers);
+  return apiRequest<string, GenericResponse>('delete', 'project/' + id, {}, undefined, headers);
 };
