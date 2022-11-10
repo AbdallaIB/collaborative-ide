@@ -11,6 +11,10 @@ module.exports = {
   },
   plugins: [...require('./webpack.plugins')],
   resolve: {
+    fallback: {
+      crypto: require.resolve('crypto-browserify'),
+      stream: require.resolve('stream-browserify'),
+    },
     extensions: ['.js', '.ts', '.jsx', '.tsx', '.css'],
     alias: {
       // Custom Aliases
