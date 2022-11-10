@@ -1,40 +1,62 @@
 import useAuthStore from '@lib/stores/auth';
 import useToast from '@lib/hooks/useToast';
-import IconButton from '@components/shared/icon-button';
 import { Link, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import DummyProfile from '@assets/dummyProfile.svg';
+import useDarkModeStore from '@lib/stores/darkMode';
 
 const Header = () => {
   const navigate = useNavigate();
   const { success } = useToast();
-  const { logout } = useAuthStore();
+  const { darkMode, setDarkMode } = useDarkModeStore();
+  const { logout, authUser } = useAuthStore();
+  const [showMenu, setShowMenu] = useState(false);
 
-  const logoutUser = async () => {
+  const logoutUser = () => {
     logout();
     success('Successfully logged out');
     navigate('/');
   };
 
   return (
-    <header className="border-b border-palette-lighter w-full bg-white">
-      <div className="flex flex-row items-center justify-between mx-auto max-w-6xl px-6 pb-2 pt-3">
-        <div className="flex flex-row items-center justify-between gap-4">
-          <Link to="/">
-            <div>
-              <i className="bx bx-terminal opacity-50 text-5xl"></i>
+    <header className="flex flex-row justify-between w-full px-6 border-solid border-b border-gray-200 dark:border-main_dark">
+      <Link to="/">
+        <div className="my-2 flex flex-row justify-center items-center gap-2">
+          <div className="w-9 p-0.5 rounded-lg flex justify-center items-center">
+            <i className="bx bx-terminal text-4xl text-main"></i>
+          </div>
+        </div>
+      </Link>
+
+      <nav className="flex flex-row items-center gap-5">
+        <div className="p-2 hover:bg-gray-100 dark:hover:bg-gray-500 text-main_dark dark:text-main_side rounded-lg">
+          <button type="button" onClick={() => setDarkMode(!darkMode)} className="text-[1.5rem] flex items-center">
+            {darkMode ? <i className="bx bx-sun"></i> : <i className="bx bx-moon"></i>}
+          </button>
+        </div>
+
+        {authUser && (
+          <div className="h-9 w-9 rounded-full bg-gray-100 flex items-center justify-center relative">
+            <button onClick={() => setShowMenu(!showMenu)}>
+              <img src={DummyProfile} alt="profile"></img>
+            </button>
+            <div
+              style={{ display: showMenu ? 'flex' : 'none' }}
+              className="absolute right-0 z-10 mt-20 origin-top-right rounded-md shadow-lg bg-gray-100"
+            >
+              <div className="py-1 whitespace-nowrap" role="none">
+                <button
+                  onClick={logoutUser}
+                  className="text-main_dark hover:bg-gray-200 block px-4 py-2 text-sm text-center w-full"
+                  role="menuitem"
+                >
+                  Logout
+                </button>
+              </div>
             </div>
-          </Link>
-        </div>
-        <div className="group relative">
-          <IconButton
-            onClick={logoutUser}
-            backgroundColor="gray"
-            iconClass="bx bx-log-out opacity-75 text-xl"
-          ></IconButton>
-          <span className="absolute -left-1/4 top-full translate-y-1/2 rounded bg-gray-900 px-2 py-1.5 text-xs font-medium text-white opacity-0 group-hover:opacity-100">
-            Logout
-          </span>
-        </div>
-      </div>
+          </div>
+        )}
+      </nav>
     </header>
   );
 };
