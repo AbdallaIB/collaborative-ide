@@ -1,4 +1,3 @@
-import { core } from '@config/env/core';
 import { config } from 'dotenv';
 import { resolve } from 'path';
 import { extend } from 'underscore';
@@ -16,7 +15,7 @@ process.on('uncaughtException', (err) => {
 
 // extend the base configuration in core.js with environment specific configuration
 const env = extend(
-  core,
+  require('@config/env/core').core,
   // eslint-disable-next-line global-require
   require(`./env/${process.env.NODE_ENV}`) || {},
 );

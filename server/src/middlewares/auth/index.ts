@@ -1,4 +1,4 @@
-import { verifyJwt } from './../../utils/jwt';
+import { verifyJwt } from '@utils/jwt';
 import { statusCodes } from '@utils/constants';
 import loggerHandler from '@utils/logger';
 const moduleName = '[auth] ';
@@ -16,7 +16,7 @@ export const validateToken = async (req: Request, res: Response, next: NextFunct
   const bearerToken = getToken(req);
   const authData = verifyJwt(bearerToken);
   if (!authData) {
-    logger.error('[validateToken][Error]', 'Token has been Expired');
+    logger.error('[validateToken][error]', 'Token has been Expired');
     return res.status(statusCodes.UNAUTHORIZED).json({
       message: 'Session has been expired',
     });

@@ -33,7 +33,7 @@ export const core = {
     readPreference: 'nearest',
     useUnifiedTopology: true,
   },
-  TOKEN_EXPIRE_TIME_SEC: 15000000,
+  TOKEN_EXPIRE_TIME_SEC: process.env.TOKEN_EXPIRE_TIME_SEC,
   TOKEN_SECRET_KEY: process.env.TOKEN_SECRET_KEY,
   MONGODB: {
     DOCUMENT_EXPIRY: 3 * 3600,
