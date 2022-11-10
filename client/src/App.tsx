@@ -1,14 +1,30 @@
 import Header from '@components/header';
 import Routes from '@routes/Routes';
-import { ToastContainer } from 'react-toastify';
+import { Toaster } from 'react-hot-toast';
+import { useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
+import { PageTitles } from '@utils/helpers';
 import './App.css';
+import useDarkModeStore from '@lib/stores/darkMode';
 
 const App = () => {
+  const { pathname } = useLocation();
+  const { darkMode } = useDarkModeStore();
+
+  useEffect(() => {
+    const path: keyof typeof PageTitles = pathname as any;
+    document.title = PageTitles[path] ?? 'Collaborative Ide';
+  }, [pathname]);
+
   return (
-    <div className="flex flex-col items-center justify-start w-full h-full bg-gray-50">
-      <Header></Header>
-      <Routes />
-      <ToastContainer toastClassName="bg-main_white" pauseOnHover={false} />
+    <div className={'mainContainer ' + (darkMode ? 'dark' : '')}>
+      <div className="flex h-full flex-col w-full bg-main_side dark:bg-main_black text-main_side dark:text-gray-200 dark:hover:text-white">
+        {!pathname.startsWith('/code') && <Header></Header>}
+        <main className="h-full">
+          <Routes />
+        </main>
+      </div>
+      <Toaster toastOptions={{ position: 'top-center' }} />
     </div>
   );
 };
