@@ -1,6 +1,6 @@
 import Button from '@components/shared/button';
 import useToast from '@lib/hooks/useToast';
-import { ProviderUser } from '@services/WebsocketService';
+import { ProviderUser } from '@pages/code';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
