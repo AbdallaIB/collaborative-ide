@@ -12,10 +12,29 @@ export class Project {
   @prop({ required: [true, 'Title is required.'] })
   title: string;
 
-  @prop({ default: '' })
+  @prop({
+    default: `html, body {
+  height: 100%;
+  width: 100%;
+}`,
+  })
   css: string;
 
-  @prop({ default: '' })
+  @prop({
+    default: `<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+</head>
+
+<body>
+  Hello world
+</body>
+
+</html>
+`,
+  })
   html: string;
 
   @prop({ default: '' })
