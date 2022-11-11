@@ -1,38 +1,19 @@
 import Button from '@components/shared/button';
 import useToast from '@lib/hooks/useToast';
-import WebsocketService, { ProviderUser } from '@services/WebsocketService';
-import { useEffect, useState } from 'react';
+import { ProviderUser } from '@services/WebsocketService';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 interface Props {
   sessionId: string;
+  participants: ProviderUser[];
   leaveSession: () => void;
 }
 
-const ProjectHeader = ({ leaveSession, sessionId }: Props) => {
+const ProjectHeader = ({ leaveSession, sessionId, participants }: Props) => {
   const { promise } = useToast();
-  const [participants, setParticipants] = useState<ProviderUser[]>([]);
   const [showCopyDropdown, setShowCopyDropdown] = useState(false);
   const sessionInviteLink = window.location.href;
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const provider = WebsocketService.provider;
-      if (provider) {
-        const states = provider?.awareness.states;
-        if (!states) return;
-        const participants: ProviderUser[] = [];
-        states.forEach((state) => {
-          const user = state.user as ProviderUser;
-          if (user) participants.push(user);
-        });
-        setParticipants(participants);
-      }
-    }, 2500);
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [participants]);
 
   const handleCopy = (text: string) => {
     navigator.clipboard.writeText(text);

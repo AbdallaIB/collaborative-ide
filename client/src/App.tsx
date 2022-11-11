@@ -6,6 +6,7 @@ import { useEffect } from 'react';
 import { PageTitles } from '@utils/helpers';
 import './App.css';
 import useDarkModeStore from '@lib/stores/darkMode';
+import theme from '@styles/shared/theme';
 
 const App = () => {
   const { pathname } = useLocation();
@@ -24,7 +25,12 @@ const App = () => {
           <Routes />
         </main>
       </div>
-      <Toaster toastOptions={{ position: 'top-center' }} />
+      <Toaster
+        toastOptions={{
+          style: { backgroundColor: theme.colors.main_side, color: theme.colors.main_dark },
+          position: 'top-center',
+        }}
+      />
     </div>
   );
 };

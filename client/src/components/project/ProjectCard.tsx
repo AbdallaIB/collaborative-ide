@@ -37,13 +37,13 @@ const ProjectCard = ({ project, openProject, deleteProject }: Props) => {
   return (
     <>
       <div className="rounded shadow-lg mx-auto relative w-full bg-main_side dark:bg-main_dark text-main_dark dark:text-main_side">
-        <div className="flex flex-col w-full">
-          <div className="flex flex-col items-center justify-around p-4 gap-5">
-            <div className="text-2xl font-semibold">{title}</div>
+        <div className="flex flex-col w-full h-full">
+          <div className="flex flex-col items-center justify-around p-4 gap-5 h-full">
+            <div className="text-2xl font-semibold text-center">{title}</div>
             <div className="flex flex-row gap-4 text-base">
               {content.content.map(({ language, contentLength }) => {
                 const { color, name, icon } = docsDetails.filter((doc) => doc.name === language)[0];
-                const languagePercentage = (contentLength / content.totalContentLength) * 100;
+                const languagePercentage = Math.round((contentLength / content.totalContentLength) * 100);
                 return (
                   <div key={name} className="flex flex-col gap-3 items-center justify-between">
                     <i className={icon + ' text-3xl'} style={{ color }}></i>
