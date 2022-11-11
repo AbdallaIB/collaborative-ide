@@ -43,7 +43,7 @@ export const docsDetails: Doc[] = [
   { name: 'css', mode: 'css', content: '', icon: 'bx bxl-css3', color: '#264DE4' },
 ];
 
-const fiveMinutes = 300000;
+const twoMinutes = 120000;
 
 const Code = () => {
   let { id } = useParams();
@@ -204,7 +204,7 @@ const Code = () => {
         success: 'Project saved!',
         error: 'Failed to save project',
       });
-    }, fiveMinutes);
+    }, twoMinutes);
   };
 
   return (
