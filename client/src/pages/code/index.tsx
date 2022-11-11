@@ -13,10 +13,21 @@ import JoinProject from '@components/project/JoinProjectForm';
 import { ProjectJoinInput } from '@api/types';
 import ProjectHeader from '@components/project/ProjectHeader';
 import Modal from '@components/modal';
-import WebsocketService from '@services/WebsocketService';
 import useToast from '@lib/hooks/useToast';
+import { WebsocketProvider } from 'y-websocket';
+
+export type ProviderUser = {
+  name: string;
+  color: string;
+  initials: string;
+};
 
 export type EditorDoc = 'js' | 'html' | 'css';
+
+export type EditorData = {
+  editor: CodeMirror.Editor | null;
+  provider: WebsocketProvider | null;
+};
 
 export type Doc = {
   name: EditorDoc;
@@ -36,22 +47,37 @@ const fiveMinutes = 300000;
 
 const Code = () => {
   let { id } = useParams();
-  const { errorMessage } = useToast();
+  const { errorMessage, promise } = useToast();
   const { authUser } = useAuthStore();
   const navigate = useNavigate();
   const [username, setUsername] = useLocalStorage('username', authUser?.username || '');
   const saveIntervalRef = useRef<NodeJS.Timer>();
   const [showJoinProject, setShowJoinProject] = useState(false);
-  const [html, setHtml] = useLocalStorage('html', '');
-  const [css, setCss] = useLocalStorage('css', '');
-  const [js, setJs] = useLocalStorage('js', '');
+  const [html, setHtml] = useState('');
+  const [css, setCss] = useState('');
+  const [js, setJs] = useState('');
   const [contentSrc, setContentSrc] = useState('');
+  const [participants, setParticipants] = useState<ProviderUser[]>([]);
   const [docs, setDocs] = useState<{ [key in EditorDoc]: CodeMirror.Doc } | null>(null);
   const [selectedDoc, setSelectedDoc] = useState<EditorDoc>('js');
+  const defaultEditor = {
+    editor: null,
+    provider: null,
+  };
+  const [editors, setEditors] = useState<{ [key in EditorDoc]: EditorData }>({
+    js: defaultEditor,
+    html: defaultEditor,
+    css: defaultEditor,
+  });
 
   useEffect(() => {
     const timeout = setTimeout(() => {
       console.log({ html, css, js });
+      const content = {
+        html,
+        css,
+        js,
+      };
       setContentSrc(`
         <html>
           <body>${html}</body>
@@ -59,10 +85,36 @@ const Code = () => {
           <script>${js}</script>
         </html>
       `);
+      //   for (let key in docs) {
+      //     const docKey = key as EditorDoc;
+      //     const doc = docs[docKey];
+      //     const cursorPosition = doc.getCursor();
+      //     doc.setValue(content[docKey] || '');
+      //     doc.setCursor(cursorPosition);
+      //   }
     }, 250);
 
     return () => clearTimeout(timeout);
   }, [html, css, js]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const provider = editors.js.provider;
+      if (provider) {
+        const states = provider?.awareness.states;
+        if (!states) return;
+        const participants: ProviderUser[] = [];
+        states.forEach((state) => {
+          const user = state.user as ProviderUser;
+          if (user) participants.push(user);
+        });
+        setParticipants(participants);
+      }
+    }, 500);
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, []);
 
   useEffect(() => {
     if (!username) {
@@ -88,12 +140,14 @@ const Code = () => {
 
   const fetchData = async () => {
     if (!id) return navigate('/');
+    if (!authUser) return;
     try {
       const { css, js, html, ownerId } = (await getProjectById(id)).project;
       handleAutomaticProjectSave(ownerId);
       setCss(css);
       setJs(js);
       setHtml(html);
+      selectDoc('js');
     } catch (err) {
       errorMessage('Project not found');
       navigate('/');
@@ -123,16 +177,9 @@ const Code = () => {
   };
 
   const selectDoc = (doc: EditorDoc) => {
-    let { editor } = WebsocketService;
-    console.log('selectedDoc', doc, docs, editor);
+    const editor = editors[doc].editor;
     if (!docs || !editor) return;
-    const updatedEditor = editor;
-    updatedEditor.swapDoc(docs[doc]);
-    editor = updatedEditor;
-    console.log('before set selectedDoc', selectedDoc, doc, editor.modeOption);
     setSelectedDoc(doc);
-    editor.modeOption = docsDetails.filter((doc) => doc.name === selectedDoc)[0].mode;
-    console.log('after set selectedDoc', selectedDoc, doc, editor.modeOption);
   };
 
   const createDocs = () => {
@@ -149,12 +196,14 @@ const Code = () => {
   };
 
   const handleAutomaticProjectSave = (ownerId: string) => {
-    if (!id) return;
-    const user = authUser;
-    if (!user || user.uId !== ownerId) return;
+    if (!id || !authUser || authUser.uId !== ownerId) return;
     saveIntervalRef.current = setInterval(() => {
       if (!id) return;
-      updateProject(id, { html, css, js });
+      promise(updateProject(id, { html, css, js }), {
+        loading: 'Saving project...',
+        success: 'Project saved!',
+        error: 'Failed to save project',
+      });
     }, fiveMinutes);
   };
 
@@ -163,7 +212,11 @@ const Code = () => {
       {!showJoinProject ? (
         <div className="flex flex-col w-full h-full">
           <div className="flex w-full">
-            <ProjectHeader leaveSession={() => navigate('/')} sessionId={id || ''}></ProjectHeader>
+            <ProjectHeader
+              participants={participants}
+              leaveSession={() => navigate('/')}
+              sessionId={id || ''}
+            ></ProjectHeader>
           </div>
           <div className="flex flex-row w-full h-full overflow-x-hidden relative">
             <EditorSidebar
@@ -171,24 +224,38 @@ const Code = () => {
               docs={docsDetails}
               selectedDoc={selectedDoc}
             ></EditorSidebar>
-            <div className="flex flex-row w-full h-full">
-              <div className="flex flex-col w-[65%] h-full">
-                <div className="editor-title border-b border-main_dark bg-main_black">
-                  <ActiveDocTab selectedDoc={docsDetails.filter((doc) => doc.name === selectedDoc)[0]}></ActiveDocTab>
-                </div>
-                <div className={`editor-container`}>
-                  {username && (
-                    <Editor
-                      username={username}
-                      sessionId={id!}
-                      createDocs={createDocs}
-                      onValueChange={handleEditorChange}
-                    />
-                  )}
-                </div>
+            <div className="flex flex-col w-[65%] h-full">
+              <div className="editor-title border-b border-main_dark bg-main_black">
+                <ActiveDocTab selectedDoc={docsDetails.filter((doc) => doc.name === selectedDoc)[0]}></ActiveDocTab>
               </div>
-              <ContentPresenter contentSrc={contentSrc}></ContentPresenter>
+              {username &&
+                docsDetails.map((doc: Doc) => {
+                  return (
+                    <div
+                      key={doc.name}
+                      style={{ display: selectedDoc === doc.name ? 'flex' : 'none' }}
+                      className={`editor-container`}
+                    >
+                      <Editor
+                        doc={doc}
+                        username={username}
+                        sessionId={id!}
+                        createDocs={createDocs}
+                        onValueChange={handleEditorChange}
+                        initEditor={(editorData: EditorData) => {
+                          setEditors((prevEditors) => {
+                            return {
+                              ...prevEditors,
+                              [doc.name]: editorData,
+                            };
+                          });
+                        }}
+                      />
+                    </div>
+                  );
+                })}
             </div>
+            <ContentPresenter contentSrc={contentSrc}></ContentPresenter>
           </div>
         </div>
       ) : (

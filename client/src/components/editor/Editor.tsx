@@ -1,35 +1,36 @@
 import { useEffect, useRef, useState } from 'react';
-import { UndoManager } from 'yjs';
 import CodeMirror from 'codemirror';
 import './EditorAddons';
 import { JSHINT, LintError } from 'jshint';
 import { HTMLHint } from 'htmlhint';
 import { Hint } from 'htmlhint/types';
-import WebsocketService, { ProviderUser } from '@services/WebsocketService';
 import { generateColor } from '@utils/colorGenerator';
+import { Doc, EditorData, ProviderUser } from '@pages/code';
+import { Doc as YjsDoc, UndoManager } from 'yjs';
+import useToast from '@lib/hooks/useToast';
+import { WebsocketProvider } from 'y-websocket';
+import { CodemirrorBinding } from 'y-codemirror';
 
 interface Props {
+  doc: Doc;
   sessionId: string;
   username: string;
   onValueChange: (value: string, type: string) => void;
   createDocs: () => void;
+  initEditor: (editor: EditorData) => void;
 }
 
-const Editor = ({ sessionId, username, onValueChange, createDocs }: Props) => {
+const Editor = ({ doc, sessionId, username, onValueChange, createDocs, initEditor }: Props) => {
+  const { error, errorMessage } = useToast();
   const [waiting, setWaiting] = useState<NodeJS.Timeout>();
   const EditorRef = useRef(null);
 
   useEffect(() => {
-    return WebsocketService.disconnect();
-  }, []);
-
-  useEffect(() => {
     if (!EditorRef) return;
-    initEditor();
-  }, [EditorRef]);
-
-  const initEditor = (): void => {
-    const user = {
+    let provider: WebsocketProvider | null = null;
+    let yjsDoc: YjsDoc | null = null;
+    let binding: CodemirrorBinding | null = null;
+    const user: ProviderUser = {
       name: username,
       color: generateColor([]),
       initials: username[0].toUpperCase(),
@@ -37,6 +38,7 @@ const Editor = ({ sessionId, username, onValueChange, createDocs }: Props) => {
     try {
       const editorElem = EditorRef.current as any;
       const editor = CodeMirror(editorElem, {
+        mode: doc.mode,
         lineNumbers: true,
         theme: 'material-darker',
         autoCloseTags: true,
@@ -57,35 +59,63 @@ const Editor = ({ sessionId, username, onValueChange, createDocs }: Props) => {
       // create docs
       createDocs();
 
-      initProvider(user, editor);
+      // yjs Doc
+      yjsDoc = new YjsDoc({
+        meta: {
+          sessionId,
+          user,
+        },
+      });
 
-      const yText = WebsocketService.doc?.getText('codemirror');
+      // provider
+      const websocketEndpoint = process.env.WEBSOCKET_ENDPOINT;
+      if (!websocketEndpoint) {
+        error('Websocket endpoint not found');
+        return;
+      }
 
+      provider = new WebsocketProvider(websocketEndpoint, `${sessionId}-${doc.name}`, yjsDoc);
+      if (!provider) return;
+      // A Yjs document holds the shared data
+      provider.on('status', (event: { status: string }) => {
+        console.log(event);
+        if (event.status === 'connected') {
+          (provider! as any).user = user;
+          //   console.log(provider);
+          initEditor({
+            editor,
+            provider,
+          });
+        }
+      });
+      provider.on('error', () => {
+        error('Error in collaborating try refreshing or come back later!');
+      });
+
+      provider.awareness.setLocalStateField('user', user);
+
+      // create binding
+      const yText = yjsDoc.getText('codemirror');
       const yUndoManager = new UndoManager(yText!);
-
-      WebsocketService.setProviderUser(user);
-
-      WebsocketService.createEditorBinding(yText!, editor, yUndoManager);
+      binding = new CodemirrorBinding(yText, editor, provider.awareness, {
+        yUndoManager,
+      });
 
       editor.on('change', () => {
-        const { editor } = WebsocketService;
-        if (!editor) return;
         onValueChange(editor.getValue(), editor.getMode().name || '');
         clearTimeout(waiting);
         setWaiting(setTimeout(() => updateHints(editor), 500));
       });
     } catch (err) {
       console.log('Error: ', err);
+      errorMessage(err);
     }
-  };
-
-  const initProvider = async (user: ProviderUser, editor: CodeMirror.Editor) => {
-    try {
-      await WebsocketService.initProvider(sessionId, user, editor);
-    } catch (err) {
-      console.log('Error: ', err);
-    }
-  };
+    return () => {
+      if (provider) provider.destroy();
+      if (yjsDoc) yjsDoc.destroy();
+      if (binding) binding.destroy();
+    };
+  }, [EditorRef]);
 
   const updateHints = (editor: CodeMirror.Editor) => {
     editor.operation(() => {
@@ -99,11 +129,16 @@ const Editor = ({ sessionId, username, onValueChange, createDocs }: Props) => {
     console.log('selectedDoc getErrors', editor.getMode().name);
     switch (editor.getMode().name) {
       case 'javascript': {
-        JSHINT(editor.getValue());
+        JSHINT(editor.getValue(), {
+          esversion: 6,
+          asi: true,
+        });
         return JSHINT.errors;
       }
       case 'htmlmixed':
-        return HTMLHint.verify('<!DOCTYPE html> ' + editor.getValue());
+        return HTMLHint.verify('<!DOCTYPE html> ' + editor.getValue(), {
+          'attr-value-double-quotes': false,
+        });
       default:
         return [];
     }
@@ -131,7 +166,6 @@ const Editor = ({ sessionId, username, onValueChange, createDocs }: Props) => {
     <div
       ref={EditorRef}
       style={{
-        display: 'flex',
         height: '100%',
         width: '100%',
         fontSize: '20px',
