@@ -14,7 +14,7 @@ const App = () => {
 
   useEffect(() => {
     const path: keyof typeof PageTitles = pathname as any;
-    document.title = PageTitles[path] ?? 'Collaborative Ide';
+    document.title = path.startsWith('/code') ? PageTitles['/code'] : PageTitles[path] ?? 'Collaborative Ide';
   }, [pathname]);
 
   return (

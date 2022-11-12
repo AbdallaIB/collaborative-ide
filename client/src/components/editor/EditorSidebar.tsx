@@ -24,11 +24,11 @@ const EditorSidebar = ({ docs, onDocSelect, selectedDoc }: Props) => {
       }
     >
       <div className={showSidebar ? 'px-4' : 'flex flex-col w-16 items-center justify-center'}>
-        <div className="flex justify-center w-10 py-1.5 rounded-lg border-gray-100">
+        <div className="flex justify-center w-10 py-1.5 rounded-lg border-main_dark">
           <span className="text-sm font-medium"> Files </span>
         </div>
 
-        <div className="flex flex-col space-y-1 gap-1 border-t border-gray-100">
+        <div className="flex flex-col space-y-1 gap-1 border-t border-main_dark">
           <div className="flex flex-col">
             {docs.map((doc, index) => (
               <button
@@ -56,7 +56,7 @@ const EditorSidebar = ({ docs, onDocSelect, selectedDoc }: Props) => {
         </div>
       </div>
 
-      <div className="sticky inset-x-0 bottom-0 border-t border-gray-100">
+      <div className="sticky inset-x-0 bottom-0 border-t border-main_dark">
         <div className="flex justify-center p-1 rounded-lg">
           <button
             onClick={() => setShowSidebar(!showSidebar)}
