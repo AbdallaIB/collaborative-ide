@@ -10,17 +10,19 @@ import { Doc as YjsDoc, UndoManager } from 'yjs';
 import useToast from '@lib/hooks/useToast';
 import { WebsocketProvider } from 'y-websocket';
 import { CodemirrorBinding } from 'y-codemirror';
+import { getAuthHeaders } from '@api/index';
 
 interface Props {
   doc: Doc;
   sessionId: string;
+  value: string;
   username: string;
+  showEditor: boolean;
   onValueChange: (value: string, type: string) => void;
-  createDocs: () => void;
   initEditor: (editor: EditorData) => void;
 }
 
-const Editor = ({ doc, sessionId, username, onValueChange, createDocs, initEditor }: Props) => {
+const Editor = ({ doc, sessionId, username, value, showEditor, onValueChange, initEditor }: Props) => {
   const { error, errorMessage } = useToast();
   const [waiting, setWaiting] = useState<NodeJS.Timeout>();
   const EditorRef = useRef(null);
@@ -39,6 +41,7 @@ const Editor = ({ doc, sessionId, username, onValueChange, createDocs, initEdito
       const editorElem = EditorRef.current as any;
       const editor = CodeMirror(editorElem, {
         mode: doc.mode,
+        value,
         lineNumbers: true,
         theme: 'material-darker',
         autoCloseTags: true,
@@ -56,9 +59,6 @@ const Editor = ({ doc, sessionId, username, onValueChange, createDocs, initEdito
         gutters: ['CodeMirror-linenumbers', 'gutter-error'],
       });
 
-      // create docs
-      createDocs();
-
       // yjs Doc
       yjsDoc = new YjsDoc({
         meta: {
@@ -74,7 +74,9 @@ const Editor = ({ doc, sessionId, username, onValueChange, createDocs, initEdito
         return;
       }
 
-      provider = new WebsocketProvider(websocketEndpoint, `${sessionId}-${doc.name}`, yjsDoc);
+      provider = new WebsocketProvider(websocketEndpoint, `${sessionId}-${doc.name}`, yjsDoc, {
+        params: getAuthHeaders(),
+      });
       if (!provider) return;
       // A Yjs document holds the shared data
       provider.on('status', (event: { status: string }) => {
@@ -92,14 +94,14 @@ const Editor = ({ doc, sessionId, username, onValueChange, createDocs, initEdito
         error('Error in collaborating try refreshing or come back later!');
       });
 
-      provider.awareness.setLocalStateField('user', user);
-
       // create binding
       const yText = yjsDoc.getText('codemirror');
       const yUndoManager = new UndoManager(yText!);
       binding = new CodemirrorBinding(yText, editor, provider.awareness, {
         yUndoManager,
       });
+
+      binding.awareness.setLocalStateField('user', user);
 
       editor.on('change', () => {
         onValueChange(editor.getValue(), editor.getMode().name || '');
@@ -165,7 +167,9 @@ const Editor = ({ doc, sessionId, username, onValueChange, createDocs, initEdito
   return (
     <div
       ref={EditorRef}
+      id={doc.name}
       style={{
+        display: showEditor ? 'flex' : 'none',
         height: '100%',
         width: '100%',
         fontSize: '20px',

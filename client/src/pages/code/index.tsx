@@ -51,6 +51,7 @@ const Code = () => {
   const { authUser } = useAuthStore();
   const navigate = useNavigate();
   const [username, setUsername] = useLocalStorage('username', authUser?.username || '');
+  const [ownerId, setOwnerId] = useState('');
   const saveIntervalRef = useRef<NodeJS.Timer>();
   const [showJoinProject, setShowJoinProject] = useState(false);
   const [html, setHtml] = useState('');
@@ -58,7 +59,6 @@ const Code = () => {
   const [js, setJs] = useState('');
   const [contentSrc, setContentSrc] = useState('');
   const [participants, setParticipants] = useState<ProviderUser[]>([]);
-  const [docs, setDocs] = useState<{ [key in EditorDoc]: CodeMirror.Doc } | null>(null);
   const [selectedDoc, setSelectedDoc] = useState<EditorDoc>('js');
   const defaultEditor = {
     editor: null,
@@ -73,11 +73,6 @@ const Code = () => {
   useEffect(() => {
     const timeout = setTimeout(() => {
       console.log({ html, css, js });
-      const content = {
-        html,
-        css,
-        js,
-      };
       setContentSrc(`
         <html>
           <body>${html}</body>
@@ -85,13 +80,6 @@ const Code = () => {
           <script>${js}</script>
         </html>
       `);
-      //   for (let key in docs) {
-      //     const docKey = key as EditorDoc;
-      //     const doc = docs[docKey];
-      //     const cursorPosition = doc.getCursor();
-      //     doc.setValue(content[docKey] || '');
-      //     doc.setCursor(cursorPosition);
-      //   }
     }, 250);
 
     return () => clearTimeout(timeout);
@@ -114,7 +102,7 @@ const Code = () => {
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, []);
+  }, [editors.js]);
 
   useEffect(() => {
     if (!username) {
@@ -125,13 +113,13 @@ const Code = () => {
     fetchData();
 
     // handle page refresh
-    const unloadCallback = (event: BeforeUnloadEvent) => {
+    const unloadCallback = async (event: BeforeUnloadEvent) => {
       event.preventDefault();
       event.returnValue = '';
       return '';
     };
 
-    // window.addEventListener('beforeunload', unloadCallback);
+    window.addEventListener('beforeunload', unloadCallback);
     return () => {
       window.removeEventListener('beforeunload', unloadCallback);
       if (saveIntervalRef.current) clearInterval(saveIntervalRef.current);
@@ -143,6 +131,7 @@ const Code = () => {
     if (!authUser) return;
     try {
       const { css, js, html, ownerId } = (await getProjectById(id)).project;
+      setOwnerId(ownerId);
       handleAutomaticProjectSave(ownerId);
       setCss(css);
       setJs(js);
@@ -178,21 +167,15 @@ const Code = () => {
 
   const selectDoc = (doc: EditorDoc) => {
     const editor = editors[doc].editor;
-    if (!docs || !editor) return;
+    if (!editor) return;
     setSelectedDoc(doc);
-  };
-
-  const createDocs = () => {
-    const value = { js, css, html };
-    docsDetails.forEach((doc) => {
-      const { name, mode } = doc;
-      setDocs((prevDocs: any) => {
-        return {
-          ...prevDocs,
-          [name]: CodeMirror.Doc(value[name], mode),
-        };
-      });
-    });
+    setTimeout(() => {
+      const value = selectedDoc === 'js' ? js : selectedDoc === 'html' ? html : css;
+      editor.setValue(value);
+      editor.setCursor(value.length || 0);
+      editor.refresh();
+      editor.focus();
+    }, 10);
   };
 
   const handleAutomaticProjectSave = (ownerId: string) => {
@@ -207,6 +190,22 @@ const Code = () => {
     }, twoMinutes);
   };
 
+  const handleLeaveSession = async (isLeaving: boolean) => {
+    console.log(id, authUser, authUser!.uId === ownerId, ownerId);
+    if (id && authUser) {
+      console.log('saving project');
+      const updateProjectPromise = updateProject(id, { html, css, js });
+      promise(updateProjectPromise, {
+        loading: 'Saving project...',
+        success: 'Project saved!',
+        error: 'Failed to save project',
+      });
+      await updateProjectPromise;
+      console.log('project saved');
+    }
+    if (isLeaving) navigate('/');
+  };
+
   return (
     <div className="flex w-full max-w-screen h-full overflow-hidden">
       {!showJoinProject ? (
@@ -214,7 +213,7 @@ const Code = () => {
           <div className="flex w-full">
             <ProjectHeader
               participants={participants}
-              leaveSession={() => navigate('/')}
+              leaveSession={() => handleLeaveSession(true)}
               sessionId={id || ''}
             ></ProjectHeader>
           </div>
@@ -228,32 +227,30 @@ const Code = () => {
               <div className="editor-title border-b border-main_dark bg-main_black">
                 <ActiveDocTab selectedDoc={docsDetails.filter((doc) => doc.name === selectedDoc)[0]}></ActiveDocTab>
               </div>
-              {username &&
-                docsDetails.map((doc: Doc) => {
-                  return (
-                    <div
-                      key={doc.name}
-                      style={{ display: selectedDoc === doc.name ? 'flex' : 'none' }}
-                      className={`editor-container`}
-                    >
+              <div className="editor-container">
+                {username &&
+                  docsDetails.map((doc: Doc) => {
+                    return (
                       <Editor
+                        key={doc.name}
                         doc={doc}
+                        value={selectedDoc === 'js' ? js : selectedDoc === 'html' ? html : css}
                         username={username}
+                        showEditor={selectedDoc === doc.name}
                         sessionId={id!}
-                        createDocs={createDocs}
                         onValueChange={handleEditorChange}
-                        initEditor={(editorData: EditorData) => {
+                        initEditor={({ editor, provider }: EditorData) => {
+                          if (!editor || !provider) return;
                           setEditors((prevEditors) => {
-                            return {
-                              ...prevEditors,
-                              [doc.name]: editorData,
-                            };
+                            const obj = { ...prevEditors };
+                            obj[doc.name] = { editor, provider };
+                            return obj;
                           });
                         }}
                       />
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+              </div>
             </div>
             <ContentPresenter contentSrc={contentSrc}></ContentPresenter>
           </div>
