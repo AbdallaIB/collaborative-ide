@@ -54,7 +54,11 @@ export class ProjectController {
     logger.info('[getProject][params]', req.params as { id: string });
     try {
       const { id } = req.params;
-      const project = await findProjectById(id);
+      const { uId } = req.user;
+      const project = await findProjectById(id, uId);
+      if (!project) {
+        return res.status(statusCodes.NOT_FOUND).json({ message: 'Project not found' });
+      }
       res.status(statusCodes.OK).json({
         project,
       });
@@ -67,8 +71,9 @@ export class ProjectController {
   public async updateProject(req: RequestWithUser, res: Response) {
     logger.info('[updateProject][params]', req.params as { id: string });
     const { id } = req.params;
+    const { uId } = req.user;
     try {
-      const project = await updateProjectById(id, req.body);
+      const project = await updateProjectById(id, uId, req.body);
       res.status(statusCodes.OK).json({
         project,
       });

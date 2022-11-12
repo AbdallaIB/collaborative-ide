@@ -7,9 +7,9 @@ export const createProject = async (input: Partial<Project>) => {
 };
 
 // Find project by Id
-export const findProjectById = async (id: string) => {
+export const findProjectById = async (id: string, userId: string) => {
   const project = projectModel.findOne(
-    { _id: id },
+    { _id: id, ownerId: userId },
     { title: 1, css: 1, html: 1, js: 1, updatedAt: 1, ownerId: 1 },
     { lean: 1 },
   );
@@ -27,8 +27,8 @@ export const findAllUsersProjects = async (id: string) => {
 };
 
 // Update project by Id
-export const updateProjectById = async (id: string, input: Partial<Project>) => {
-  const project = projectModel.findOneAndUpdate({ _id: id }, input, { new: true });
+export const updateProjectById = async (id: string, userId: string, input: Partial<Project>) => {
+  const project = projectModel.findOneAndUpdate({ _id: id, ownerId: userId }, input, { new: true });
   return project;
 };
 
