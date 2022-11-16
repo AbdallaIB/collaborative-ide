@@ -168,14 +168,15 @@ const Code = () => {
   const selectDoc = (doc: EditorDoc) => {
     const editor = editors[doc].editor;
     if (!editor) return;
-    setSelectedDoc(doc);
     setTimeout(() => {
-      const value = selectedDoc === 'js' ? js : selectedDoc === 'html' ? html : css;
+      const cursorPosition = editor.getCursor();
+      const value = doc === 'js' ? js : doc === 'html' ? html : css;
       editor.setValue(value);
-      editor.setCursor(value.length || 0);
+      editor.setCursor(cursorPosition || value.length || 0);
       editor.refresh();
       editor.focus();
     }, 10);
+    setSelectedDoc(doc);
   };
 
   const handleAutomaticProjectSave = (ownerId: string) => {

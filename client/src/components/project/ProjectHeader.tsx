@@ -85,7 +85,7 @@ const ProjectHeader = ({ leaveSession, sessionId, participants }: Props) => {
         </div>
 
         <div className="flex flex-row items-center gap-4">
-          <Button classes="h-7" text={'Leave'} onClick={leaveSession} backgroundColor="red" color="white"></Button>
+          <Button classes="h-7" text={'Leave'} onClick={leaveSession} isPrimary></Button>
         </div>
       </div>
     </div>

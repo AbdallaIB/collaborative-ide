@@ -43,7 +43,7 @@ const EditorSidebar = ({ docs, onDocSelect, selectedDoc }: Props) => {
                 <div
                   className=" flex items-center justify-center gap-1 absolute"
                   style={{
-                    left: '15%',
+                    left: '13%',
                     top: '0.15rem',
                   }}
                 >
