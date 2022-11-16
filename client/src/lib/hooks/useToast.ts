@@ -14,6 +14,11 @@ const useToast = () => {
   const errorMessage = (err: any) => {
     const resMessage =
       (err.response && err.response.data && err.response.data.message) || err.message || err.toString() || err[0].msg;
+       if (resMessage === 'Session has been expired') {
+      const url = window.location.protocol + '//' + window.location.host + '/login';
+      localStorage.clear();
+      window.location.href = url;
+    }
     return error(resMessage);
   };
 
