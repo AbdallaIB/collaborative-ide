@@ -1,6 +1,6 @@
 import { apiRequest } from '@api/index';
 import { ILoginResponse, IUserResponse, LoginInput, SignUpInput } from '@api/types';
-import { generateUsername } from 'unique-username-generator';
+import { generateRandomUsername } from '@utils/helpers';
 
 export const registerUser = async (values: SignUpInput) => {
   return apiRequest<SignUpInput, IUserResponse>('post', 'register', {}, values);
@@ -13,8 +13,8 @@ export const loginUser = async (values: LoginInput) => {
 export const createDemoUser = () => {
   const password = 'Test123%';
   return registerUser({
-    username: generateUsername(),
-    email: generateUsername() + '@demo.com',
+    username: generateRandomUsername(),
+    email: generateRandomUsername() + '@demo.com',
     password,
     confirmPassword: password,
   });
