@@ -3,11 +3,11 @@ import { ILoginResponse, IUserResponse, LoginInput, SignUpInput } from '@api/typ
 import { generateRandomUsername } from '@utils/helpers';
 
 export const registerUser = async (values: SignUpInput) => {
-  return apiRequest<SignUpInput, IUserResponse>('post', 'register', {}, values);
+  return apiRequest<SignUpInput, IUserResponse>('post', 'auth/register', {}, values);
 };
 
 export const loginUser = async (values: LoginInput) => {
-  return apiRequest<LoginInput, ILoginResponse>('post', 'login', {}, values);
+  return apiRequest<LoginInput, ILoginResponse>('post', 'auth/login', {}, values);
 };
 
 export const createDemoUser = () => {
