@@ -145,7 +145,7 @@ Use this space to list resources you find helpful and would like to give credit 
 [issues-url]: https://github.com/abdallaIb/collaborative-ide/issues
 [license-shield]: https://img.shields.io/github/license/abdallaIb/collaborative-ide.svg?style=for-the-badge
 [license-url]: https://github.com/abdallaIb/collaborative-ide/blob/master/LICENSE.txt
-[product-screenshot]: https://www.abdalla.pro/assets/images/9eba25ac527f94afbc6375984c5ca669.png
+[product-screenshot]: https://abdalla.tech/collaborative-ide.png
 [react.js]: https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB
 [react-url]: https://reactjs.org/
 [node.js]: https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white
