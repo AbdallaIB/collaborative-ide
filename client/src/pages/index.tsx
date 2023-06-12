@@ -102,13 +102,13 @@ const IndexPage = () => {
         <h1 className="leading-relaxed font-primary font-extrabold text-4xl text-center text-main dark:text-main mt-4 py-2 sm:py-4">
           Projects
         </h1>
-        <div className="flex flex-row items-center justify-center gap-4 whitespace-nowrap h-8">
+        <div className="flex flex-row items-center justify-center gap-4 whitespace-nowrap h-8 text-gray-600 dark:text-main_side">
           <SearchBar value={query} setValue={(e) => setQuery(e.toLowerCase())} placeholder={'Search for a Project'} />
           <Button text={'Create Project'} onClick={() => handleModal('create', true)} isPrimary></Button>
           <Button text={'Join Session'} onClick={() => handleModal('join', true)} color="gray"></Button>
         </div>
         {search(Object.values(projects)).length === 0 ? (
-          <div className="mt-40">
+          <div className="mt-40 text-gray-600 dark:text-main_side">
             <p>No projects found.</p>
           </div>
         ) : (
