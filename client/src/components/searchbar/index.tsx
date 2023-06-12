@@ -12,7 +12,7 @@ const SearchBar = ({ value, setValue, placeholder }: Props) => {
           Search
         </label>
         <div className="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
-          <i className="bx bx-search-alt-2 text-main_side"></i>
+          <i className="bx bx-search-alt-2 text-gray-600 dark:text-main_side"></i>
         </div>
         <input
           id="table-search"
